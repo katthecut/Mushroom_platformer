@@ -14,7 +14,8 @@ public class HealthBarSystem : MonoBehaviour
     public void SetMaxHealth(float maxHealth) {
         MaxHealth = maxHealth;
     }
-        public void SetHealth(float health) {
+
+    public void SetHealth(float health) {
         Health = health;
         float newWidth = (Health / MaxHealth) * Width;
 

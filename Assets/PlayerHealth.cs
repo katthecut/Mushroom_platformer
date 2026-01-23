@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-
-    public float Health, MaxHealth;
+    [SerializeField]
+    private float health;
+    public float Health { get { return health; } set { health = value; healthBar.SetHealth(value); } }
+    public float MaxHealth;
 
     [SerializeField]
     private HealthBarSystem healthBar;
@@ -11,7 +13,7 @@ public class PlayerHealth : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+
         Health = MaxHealth;
         healthBar.SetMaxHealth(MaxHealth);
         healthBar.SetHealth(Health);
@@ -21,7 +23,7 @@ public class PlayerHealth : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         
+
         /*if (Input.GetKeyDown("g")) {
             SetHealth(-20f);
         }
@@ -29,20 +31,31 @@ public class PlayerHealth : MonoBehaviour
             SetHealth(20f);
         } 
         */
-        
+
     }
 
-    public void SetHealth(float healthChange) {
-        Health += healthChange;
-        //clamp napravi da health ne ide ispod 0 npr '10 - 15' daje 0
-        Health = Mathf.Clamp(Health, 0f, MaxHealth);
+    public void SetHealth(float healthChange)
+    {
+        Health = healthChange;
+    }
 
-        healthBar.SetHealth(Health);
+    public void AddHealth(float healthChange)
+    {
+        Health += healthChange;
+
+        if (Health + healthChange < 0f)
+        {
+            Health = 0f;
+        }
+        else if (Health > MaxHealth)
+        {
+            Health = MaxHealth;
+        }
     }
 
     public void TakeDamage(float damage)
     {
-        SetHealth(-damage);
+        AddHealth(-damage);
 
         if (Health <= 0f)
         {
@@ -55,4 +68,5 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Player dead");
     }
 
+    
 }

@@ -175,6 +175,8 @@ public class PlayerMovement : MonoBehaviour
         // kad dotakne tlo opet
 
         //tjedan dana kasnije: molim??
+
+        // dva i pol tjedna kasnije ghuiashgiasjgiajaso
         if (collision.contacts[0].normal.y > 0.5f)
         {
             jumpCount = 0;

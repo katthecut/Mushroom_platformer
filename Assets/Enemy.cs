@@ -32,6 +32,8 @@ public class Enemy : MonoBehaviour
     public float dazedTime = 0.5f;
     private float dazedTimer;
 
+    private float attackTimer;
+
     //sprite tba
 
 
@@ -75,6 +77,11 @@ public class Enemy : MonoBehaviour
 
         FindPlayer();
 
+        if (attackTimer > 0f)
+        {
+            attackTimer -= Time.deltaTime;
+            //Debug.Log("ATTACK TIMER: " + attackTimer);
+        }
     }
 
     private void Flip()
@@ -95,25 +102,32 @@ public class Enemy : MonoBehaviour
     {
         Debug.Log("FIND PLAYER CALLED");
 
+
         if (isRolling || isDazed)
             return;
 
         Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+        Vector3 rayOrigin = transform.position;// + new Vector3(0, 1f, 0);
 
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, playerCheckDistance, playerLayer);
-        
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, direction, playerCheckDistance, playerLayer);
+
+        Debug.DrawRay(rayOrigin, direction * playerCheckDistance, Color.red);
+
         //ydiff radi da usporedis dvije verzije nekid stvari "side by side" 
+        
+        
 
         if (hit.collider != null)
         {
-            float yDiff = Mathf.Abs(hit.collider.transform.position.y - transform.position.y);
-            
-            if (yDiff < maxHeightDifference)
-            {
-                Debug.Log("KATIA VIDIM PLAYERA");
+            //float yDiff = Mathf.Abs(hit.collider.transform.position.y - transform.position.y);
+            RollAttack();
+            Debug.Log("KATIA VIDIM PLAYERA");
+            //if (yDiff < maxHeightDifference)
+            //{
+                
 
-                RollAttack();
-            }
+                
+            //}
         }
     }
 
@@ -142,6 +156,8 @@ public class Enemy : MonoBehaviour
 
             if (playerHealth != null)
             {
+                Dazed();
+                //Debug.Log("Damage dealt to player");
                 if (isRolling)
                 {
                     playerHealth.TakeDamage(rollDamage);
