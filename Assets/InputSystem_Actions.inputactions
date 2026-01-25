@@ -88,30 +88,8 @@
                 },
                 {
                     "name": "",
-                    "id": "583a287b-56fe-4134-8fd5-a86a11831910",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "97d966a2-fd88-43e1-b08b-ea0762dd07bc",
                     "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "af970ec9-e762-439e-ba7f-85251d42637a",
-                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
