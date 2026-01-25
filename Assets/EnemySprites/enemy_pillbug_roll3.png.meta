@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6534d27f744ddbc4b9d220ce106847a2
+guid: e0d72e5cf40830c4d8df4d4c1f3b924f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2544101018026030048
-    second: particle_orb_0
+      213: -1046889171854719887
+    second: enemy_pillbug_roll3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: particle_orb_0
+      name: enemy_pillbug_roll3_0
       rect:
         serializedVersion: 2
-        x: 22
-        y: 26
-        width: 747
-        height: 748
+        x: 81
+        y: 57
+        width: 481
+        height: 491
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 02c49d37a9981bcd0800000000000000
-      internalID: -2544101018026030048
+      spriteID: 174856848d3b871f0800000000000000
+      internalID: -1046889171854719887
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      particle_orb_0: -2544101018026030048
+      enemy_pillbug_roll3_0: -1046889171854719887
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

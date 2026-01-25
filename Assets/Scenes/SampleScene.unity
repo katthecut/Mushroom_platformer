@@ -272,7 +272,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9211307058448038475, guid: 703b185d7d7bab44a9183fbdc3e4556f, type: 3}
+  m_Sprite: {fileID: 6554635837459074051, guid: 4a9e8d2362f3ca64fa90401db285675a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -7257,7 +7257,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 10.219567
+  orthographic size: 15
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7282,7 +7282,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -151.7, y: -104.32, z: -10}
+  m_LocalPosition: {x: -155.1, y: -104.56, z: -10}
   m_LocalScale: {x: 1.8155999, y: 1.8155999, z: 1.8155999}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7302,10 +7302,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain
   ShowDebugText: 0
   ShowCameraFrustum: 1
-  IgnoreTimeScale: 0
+  IgnoreTimeScale: 1
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
-  UpdateMethod: 2
+  UpdateMethod: 0
   BlendUpdateMethod: 1
   LensModeOverride:
     Enabled: 0
@@ -7912,6 +7912,7 @@ GameObject:
   - component: {fileID: 997935279}
   - component: {fileID: 997935283}
   - component: {fileID: 997935284}
+  - component: {fileID: 997935285}
   m_Layer: 6
   m_Name: EnemySlug
   m_TagString: Untagged
@@ -8030,12 +8031,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -4252374176180585219, guid: 44b9c47b9ddecf2449a46371d2e24d94, type: 3}
+  m_Sprite: {fileID: 1538151860903050908, guid: 44b9c47b9ddecf2449a46371d2e24d94, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 16.59, y: 6.24}
+  m_Size: {x: 16.59, y: 7.01}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -8050,7 +8051,7 @@ Transform:
   m_GameObject: {fileID: 997935278}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -100.74, y: -112.76, z: 0}
+  m_LocalPosition: {x: -91.57, y: -112.98, z: 0}
   m_LocalScale: {x: 0.6579176, y: 0.6579176, z: 0.6579176}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8097,6 +8098,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 15
+--- !u!95 &997935285
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 997935278}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b0a83c2d54e861243a24b2e6f2697bee, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1027675990
 GameObject:
   m_ObjectHideFlags: 0
@@ -8215,7 +8238,7 @@ Transform:
   m_GameObject: {fileID: 1027675990}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -151.7, y: -104.32, z: 0}
+  m_LocalPosition: {x: -155.1, y: -104.56, z: 0}
   m_LocalScale: {x: 0.6052, y: 0.6052, z: 0.6052}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8690,7 +8713,7 @@ Transform:
   m_GameObject: {fileID: 1246938988}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.67, y: -3.11, z: 0}
+  m_LocalPosition: {x: 8.67, y: -3.64, z: 0}
   m_LocalScale: {x: 1.1732422, y: 1.1732422, z: 1.1732422}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8770,7 +8793,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 34
-    OrthographicSize: 10.219567
+    OrthographicSize: 15
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -8797,7 +8820,7 @@ Transform:
   m_GameObject: {fileID: 1267471802}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -151.7, y: -104.32, z: -10}
+  m_LocalPosition: {x: -155.1, y: -104.56, z: -10}
   m_LocalScale: {x: 0.6052, y: 0.6052, z: 0.6052}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9362,10 +9385,10 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
+  - {fileID: 1267471805}
   - {fileID: 619394802}
   - {fileID: 1027675994}
   - {fileID: 810439560}
-  - {fileID: 1267471805}
   - {fileID: 1567323444}
   - {fileID: 774600396}
   - {fileID: 188284044}
