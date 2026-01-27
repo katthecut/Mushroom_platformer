@@ -101,7 +101,7 @@ public class EnemyPillbug : MonoBehaviour
             {
                 if (isRolling)
                 {
-                    playerHealth.TakeDamage(GetComponent<Enemy>().normalDamage);
+                    playerHealth.TakeDamage(rollDamage);
                 }
                 else
                 {

@@ -20,16 +20,16 @@ public class PlayerMovement : MonoBehaviour
     private bool isDashing;
     private bool canDash = true;
 
-    [SerializeField] private float dashPower = 20f;
-    [SerializeField] private float dashTime = 0.5f;
-    [SerializeField] private float dashCooldown = 1f;
+    public float dashPower = 25f;
+    public float dashTime = 2f;
+    public float dashCooldown = 1f;
 
     private float dashTimer;
     private float dashCooldownTimer;
 
 
     public ParticleSystem jumpParticles;
-    [SerializeField] private TrailRenderer trail;
+    public TrailRenderer trail;
 
 
 
@@ -45,8 +45,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        //bog zna zasto si ti tu, a to nisam ja
-        //fr gdje su ostali pls
         if (isDashing)
         {
             dashTimer -= Time.deltaTime;
@@ -79,8 +77,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
-
-    //razlika fixed i normal update jednom
 
     void FixedUpdate()
     {
@@ -127,6 +123,7 @@ public class PlayerMovement : MonoBehaviour
     //i ti crkni
     public void Dash(InputAction.CallbackContext context)
     {   
+        Physics2D.IgnoreLayerCollision(6, 7, true);
         if (!context.performed)
         {
             return;
@@ -153,7 +150,9 @@ public class PlayerMovement : MonoBehaviour
         if (trail != null) 
         {
             trail.emitting = true;
-        }  
+        }
+
+        Physics2D.IgnoreLayerCollision(6, 7, false);
 
     }
 
@@ -173,10 +172,6 @@ public class PlayerMovement : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // kad dotakne tlo opet
-
-        //tjedan dana kasnije: molim??
-
-        // dva i pol tjedna kasnije ghuiashgiasjgiajaso
         if (collision.contacts[0].normal.y > 0.5f)
         {
             jumpCount = 0;
