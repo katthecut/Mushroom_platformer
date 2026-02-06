@@ -3,7 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private Rigidbody2D rb;    
+    private Rigidbody2D rb;
+    private Animator animator;
     private bool isFacingRight = true;
 
     private float originalGravity;
@@ -11,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 15f;
     float horizontalMove;
 
-    public float jumpPower = 25f;
+    public float jumpPower = 30f;
     public int maxJumps = 2;
     private int jumpCount;
 
