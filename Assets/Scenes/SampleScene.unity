@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 188284048}
   - component: {fileID: 188284050}
   - component: {fileID: 188284049}
+  - component: {fileID: 188284051}
   m_Layer: 6
   m_Name: EnemyPillbug
   m_TagString: Untagged
@@ -388,6 +389,27 @@ MonoBehaviour:
   OnPlatformEndDetected:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &188284051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188284039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f2627d0ddfc3e41b533cc6aad13646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  rollSpeed: 12
+  rollDamage: 15
+  dazedTime: 0.5
+  rollGroundCheckRadius: 0.5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  enemy: {fileID: 0}
+  enemyNormalSpeed: 5
 --- !u!1 &351656517
 GameObject:
   m_ObjectHideFlags: 0
