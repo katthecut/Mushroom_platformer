@@ -118,6 +118,11 @@ public class Enemy : MonoBehaviour
             prevHitWall = hitWall;
         }
 
+        if (hasRaycast && FindPlayer())
+        {
+            OnPlayerDetected?.Invoke();
+        }
+
     }
 
     public void Move()
