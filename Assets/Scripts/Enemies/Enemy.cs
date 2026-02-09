@@ -1,13 +1,18 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
 
     private Rigidbody2D rb;
     public int normalDamage = 10;
+
+    public bool enableMovement = true;
     public float movementSpeed = 5.0f;
+
+    public bool canBePushedByPlayer = false;
 
     // ovdje ide groundcheck ispod enemya
     public Transform groundCheck;
@@ -31,7 +36,6 @@ public class Enemy : MonoBehaviour
     private float startY;
     private bool movingUp = true;
 
-
     //raycast
     public bool hasRaycast = false;
     public LayerMask Player;
@@ -43,68 +47,76 @@ public class Enemy : MonoBehaviour
     public UnityEvent OnWallDetected;
     public UnityEvent OnPlatformEndDetected;
 
+    //prevent flipp-spamming
+    private bool prevHasGroundFront = true;
+    private bool prevHitWall = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        //non-pushable by default
+        if (!canBePushedByPlayer)
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.freezeRotation = true;
+            rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        }
+
+        startY = transform.position.y;
+    }
+
+    void Start()
+    {
+        prevHasGroundFront = CheckGroundFront();
+        prevHitWall = CheckWall();
     }
 
     //  Ovaj dio koda pomaze da vidimo gdje se nalaze transformi za raycastove u editoru
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-        Gizmos.DrawWireSphere(wallCheck.position, wallCheckRadius);
-        Gizmos.DrawWireSphere(groundCheckFront.position, wallCheckRadius);
+
+        if (groundCheck != null)
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+
+        if (groundCheckFront != null)
+            Gizmos.DrawWireSphere(groundCheckFront.position, groundCheckRadius);
+
+        if (wallCheck != null)
+            Gizmos.DrawWireSphere(wallCheck.position, wallCheckRadius);
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        if (verticalMovement)
+        // Movement
+        if (enableMovement)
         {
-            VerticalMovement();
+            if (verticalMovement) VerticalMovement();
+            else Move();
+
+            //EDGE: only flip when there is 'ground' to 'no ground'
+
+            bool hasGroundFront = CheckGroundFront();
+            if (prevHasGroundFront && !hasGroundFront)
+            {
+                OnPlatformEndDetected?.Invoke();
+                Flip();
+            }
+            prevHasGroundFront = hasGroundFront;
+
+            //WALL: only flip when there is 'no wall' to 'wall'
+            bool hitWall = CheckWall();
+            if (!prevHitWall && hitWall)
+            {
+                OnWallDetected?.Invoke();
+                Flip();
+            }
+            prevHitWall = hitWall;
         }
-        else
-        {
-            Move();
-        }
-
-
-        // imamo 2 groundChecka, jedan je ispod kako bi provjerio tlo, a drugi je ispred kako bi provjerio da nema rupa
-        if (!Physics2D.OverlapCircle(groundCheckFront.position, groundCheckRadius, groundLayer))
-        {
-            OnPlatformEndDetected?.Invoke();
-            Flip();
-        }
-
-        if (Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundLayer))
-        {
-            OnWallDetected?.Invoke();
-            Flip();
-        }
-
-        // tu spremimo rezultat funkcije FindPlayer
-        bool playerFound = FindPlayer();
-
-        if (playerFound)
-        {
-            // tu sad odraditi napad na igraca
-            // pokrece se event koji se moze koristiti u drugim skriptama
-            OnPlayerDetected?.Invoke();
-        }
-
-        //if (hasRaycast) 
-        //{ 
-        //    Vector2 direction = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-        //    RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, playerCheckDistance, Player);
-
-        //    if (hit.collider != null)
-        //    {
-        //        Debug.Log("Raycast radii!");
-        //    }
-        //}
 
     }
 
@@ -131,8 +143,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    //promijeniti kasnije za MothEnemy da ima dobar flip...
-
     public void Flip()
     {
         Vector3 scale = transform.localScale;
@@ -143,47 +153,41 @@ public class Enemy : MonoBehaviour
         _direction *= -1;
     }
 
-    // promjenio sam vamo da umjesto void vraca bool tako da mozes koristiti
-    // rezultat funkcije - true kad je igrac pronaden, false kad nije
-
     bool FindPlayer()
     {
-        //Debug.Log("FIND PLAYER CALLED");
-
-
         Vector2 direction = _direction > 0 ? Vector2.right : Vector2.left;
-        Vector3 rayOrigin = transform.position;// + new Vector3(0, 1f, 0);
+        Vector3 rayOrigin = transform.position;
 
         // player layer mask da sve ostale collidere koji nisu player ignorira
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, direction, playerCheckDistance, Player);
         Debug.DrawRay(rayOrigin, direction * playerCheckDistance, Color.red);
 
-        // ovdje napravimo provjeru da li je nesto pogodjeno i jel to igrac
-        if (hit.collider != null && hit.collider.CompareTag("Player"))
-        {
-            //Debug.Log("Player found!");
-            // ako je igrac pronaden vrati true
-            return true;
-        }
-        // ako igrac nije pronaden vrati false
-        return false;
+        return hit.collider != null && hit.collider.CompareTag("Player");
     }
 
+    private bool CheckGroundFront()
+    {
+        if (groundCheckFront == null) return true;
+        return Physics2D.OverlapCircle(groundCheckFront.position, groundCheckRadius, groundLayer);
+    }
+
+    private bool CheckWall()
+    {
+        if (wallCheck == null) return false;
+        return Physics2D.OverlapCircle(wallCheck.position, wallCheckRadius, groundLayer);
+    }
 
     //deal dmg playeru
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (!collision.gameObject.CompareTag("Player")) return;
+
+        PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
         {
-            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+            playerHealth.TakeDamage(normalDamage);
+            //Debug.Log("Damage dealt to player");
 
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(normalDamage);
-                //Debug.Log("Damage dealt to player");
-
-            }
         }
     }
-
 }

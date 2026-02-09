@@ -1,10 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private Animator animator;
     private bool isFacingRight = true;
 
     private float originalGravity;
@@ -16,8 +15,6 @@ public class PlayerMovement : MonoBehaviour
     public int maxJumps = 2;
     private int jumpCount;
 
-    //crkni
-
     private bool isDashing;
     private bool canDash = true;
 
@@ -28,21 +25,23 @@ public class PlayerMovement : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
 
-
     public ParticleSystem jumpParticles;
     public TrailRenderer trail;
 
+    // Wall/ground contact tracking
+    private bool isGrounded;
+    private bool isTouchingWall;
 
+    // cached audio
+    private PlayerAudio playerAudio;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 8f;
+
+        playerAudio = GetComponent<PlayerAudio>();
     }
-
-
-    // Update is called once per frame
 
     void Update()
     {
@@ -56,27 +55,16 @@ public class PlayerMovement : MonoBehaviour
                 rb.gravityScale = originalGravity;
 
                 if (trail != null)
-                {
                     trail.emitting = false;
-                }
-
             }
-
         }
-
-        //dash cooldown
 
         if (!canDash)
         {
             dashCooldownTimer -= Time.deltaTime;
-            
             if (dashCooldownTimer <= 0f)
-            {
                 canDash = true;
-            }
-
         }
-
     }
 
     void FixedUpdate()
@@ -84,99 +72,102 @@ public class PlayerMovement : MonoBehaviour
         if (isDashing)
             return;
 
-        rb.linearVelocity = new Vector2(horizontalMove * moveSpeed, rb.linearVelocity.y);
+        float appliedHorizontal = horizontalMove;
+
+        // Wall fix: if touching wall while airborne, don't keep forcing X velocity into wall
+        if (isTouchingWall && !isGrounded)
+            appliedHorizontal = 0f;
+
+        rb.linearVelocity = new Vector2(appliedHorizontal * moveSpeed, rb.linearVelocity.y);
 
         if (horizontalMove != 0)
             Flip();
-
     }
-
 
     public void Move(InputAction.CallbackContext context)
     {
         horizontalMove = context.ReadValue<Vector2>().x;
     }
 
-
     public void Jump(InputAction.CallbackContext context)
     {
-
         if (context.performed && jumpCount < maxJumps)
         {
-            // reset vertikalne brzine
-            //f ovdje mora biti veci od 0 da vise skace ne mijenjaj si to prog je vradzbina
-            // note to self: ako je manje od 5 onda ne moze jednim skokom skociti na najnizu platformu
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, 5f);
             rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            
-            //jump particles null da provjeri za slucaj da particle system nestane
+
             if (jumpParticles != null)
-            {
                 jumpParticles.Play();
 
-            }
-                jumpCount++;
+            // jump sound (only when jump actually happens)
+            playerAudio?.PlayJump();
 
+            jumpCount++;
         }
-
     }
-    
-    //i ti crkni
+
     public void Dash(InputAction.CallbackContext context)
-    {   
+    {
         Physics2D.IgnoreLayerCollision(6, 7, true);
-        if (!context.performed)
-        {
-            return;
-        }
 
-        if (!canDash || isDashing)
-        {
-            return;
-        }
-
+        if (!context.performed) return;
+        if (!canDash || isDashing) return;
 
         canDash = false;
         isDashing = true;
-        
+
         dashTimer = dashTime;
         dashCooldownTimer = dashCooldown;
 
-        //mijenjamo gravotaciju tako da ne padamo dok dashamo
         originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
         rb.linearVelocity = new Vector2((isFacingRight ? 1f : -1f) * dashPower, 0f);
 
-
-        if (trail != null) 
-        {
+        if (trail != null)
             trail.emitting = true;
-        }
 
         Physics2D.IgnoreLayerCollision(6, 7, false);
-
     }
 
     private void Flip()
     {
-        // okrece ako player mijenja stranu hoda/gledanja
         if ((isFacingRight && horizontalMove < 0) || (!isFacingRight && horizontalMove > 0))
         {
             isFacingRight = !isFacingRight;
             Vector3 ls = transform.localScale;
-            //ovo tu *= je za mnozenje i nema veze sa pokazivacima pls
             ls.x *= -1f;
             transform.localScale = ls;
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision) => EvaluateContacts(collision);
+    private void OnCollisionStay2D(Collision2D collision) => EvaluateContacts(collision);
+
+    private void OnCollisionExit2D(Collision2D collision)
     {
-        // kad dotakne tlo opet
-        if (collision.contacts[0].normal.y > 0.5f)
-        {
-            jumpCount = 0;
-        }
+        isGrounded = false;
+        isTouchingWall = false;
     }
 
+    private void EvaluateContacts(Collision2D collision)
+    {
+        isGrounded = false;
+        isTouchingWall = false;
+
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            Vector2 n = collision.contacts[i].normal;
+
+            if (n.y > 0.5f)
+            {
+                isGrounded = true;
+                jumpCount = 0;
+            }
+
+            if (Mathf.Abs(n.x) > 0.5f && n.y < 0.5f)
+            {
+                isTouchingWall = true;
+            }
+        }
+    }
 }
