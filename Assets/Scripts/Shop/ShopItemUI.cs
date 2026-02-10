@@ -1,19 +1,16 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ShopItemUI : MonoBehaviour
 {
-    //UI
     public TMP_Text skinNameText;
     public Image skinImage;
     public TMP_Text costText;
     public Button actionButton;
     public TMP_Text actionButtonText;
     public TMP_Text messageText;
-
-    public bool forceFillCell = true;
 
     private string skinId;
     private int cost;
@@ -22,9 +19,6 @@ public class ShopItemUI : MonoBehaviour
     {
         skinId = id;
         cost = skinCost;
-
-        if (forceFillCell)
-            ForceRootToFillCell();
 
         if (skinNameText != null) skinNameText.text = displayName;
         if (skinImage != null) skinImage.sprite = sprite;
@@ -40,31 +34,23 @@ public class ShopItemUI : MonoBehaviour
         Refresh();
     }
 
-    private void ForceRootToFillCell()
-    {
-        //this makes root obey GridLayoutGroup placement and sizing
-        RectTransform rt = GetComponent<RectTransform>();
-        if (rt == null) return;
-
-        rt.anchorMin = new Vector2(0f, 1f);
-        rt.anchorMax = new Vector2(0f, 1f);
-        rt.pivot = new Vector2(0f, 1f);
-
-        LayoutElement le = GetComponent<LayoutElement>();
-        if (le != null)
-        {
-            le.preferredWidth = -1;
-            le.preferredHeight = -1;
-            le.flexibleWidth = 0;
-            le.flexibleHeight = 0;
-        }
-    }
-
     public void Refresh()
     {
         bool unlocked = SkinSave.IsUnlocked(skinId);
+
+        if (!unlocked)
+        {
+            if (actionButtonText != null)
+                actionButtonText.text = "Buy";
+
+            if (messageText != null)
+                messageText.text = "";
+
+            return;
+        }
+
         if (actionButtonText != null)
-            actionButtonText.text = unlocked ? "Equip" : "Buy";
+            actionButtonText.text = "Equip";
     }
 
     private void OnActionPressed()
@@ -96,12 +82,10 @@ public class ShopItemUI : MonoBehaviour
         else
         {
             SkinSave.SetPending(skinId);
-
             if (messageText != null)
                 messageText.text = "Restarting to equip...";
 
             ShopManager.Instance?.CloseShop();
-
             Time.timeScale = 1f;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }

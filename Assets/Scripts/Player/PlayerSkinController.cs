@@ -44,8 +44,12 @@ public class PlayerSkinController : MonoBehaviour
 
         BuildMap();
 
-        if (targetAnimator != null && baseController != null && targetAnimator.runtimeAnimatorController == null)
+        if (targetAnimator != null &&
+            baseController != null &&
+            targetAnimator.runtimeAnimatorController == null)
+        {
             targetAnimator.runtimeAnimatorController = baseController;
+        }
     }
 
     private void OnEnable()
@@ -78,6 +82,13 @@ public class PlayerSkinController : MonoBehaviour
         }
     }
 
+    public void ForceResetToDefault()
+    {
+        SkinSave.ClearPending();
+        SkinSave.SetEquipped(defaultSkinId);
+        ApplySkin(defaultSkinId);
+    }
+
     private void ApplyFromSave()
     {
         if (targetRenderer == null)
@@ -86,19 +97,28 @@ public class PlayerSkinController : MonoBehaviour
             return;
         }
 
+        // Pending
         string pending = SkinSave.GetPending();
-        if (!string.IsNullOrEmpty(pending) && SkinSave.IsUnlocked(pending))
+        if (!string.IsNullOrEmpty(pending))
         {
-            SkinSave.SetEquipped(pending);
-            SkinSave.ClearPending();
-            if (debugLogs) Debug.Log($"[PlayerSkinController] Pending committed: {pending}");
+            if (!SkinSave.IsUnlocked(pending))
+            {
+                SkinSave.ClearPending();
+            }
+            else
+            {
+                SkinSave.SetEquipped(pending);
+                SkinSave.ClearPending();
+                if (debugLogs) Debug.Log("[PlayerSkinController] Pending committed: " + pending);
+            }
         }
 
+        // Equipped
         string equipped = SkinSave.GetEquipped();
-        if (string.IsNullOrEmpty(equipped))
+        if (string.IsNullOrEmpty(equipped) || !SkinSave.IsUnlocked(equipped))
         {
-            SkinSave.SetEquipped(defaultSkinId);
             equipped = defaultSkinId;
+            SkinSave.SetEquipped(defaultSkinId);
         }
 
         ApplySkin(equipped);
@@ -109,11 +129,10 @@ public class PlayerSkinController : MonoBehaviour
         if (string.IsNullOrEmpty(skinId)) return;
         if (map == null || map.Count == 0) BuildMap();
 
-        // Default = animated
         if (skinId == defaultSkinId)
         {
             ApplyAnimated(baseController);
-            if (debugLogs) Debug.Log($"[PlayerSkinController] Default applied: {skinId}");
+            if (debugLogs) Debug.Log("[PlayerSkinController] Default applied: " + skinId);
             return;
         }
 
@@ -126,14 +145,14 @@ public class PlayerSkinController : MonoBehaviour
         if (visual.overrideController != null)
         {
             ApplyAnimated(visual.overrideController);
-            if (debugLogs) Debug.Log($"[PlayerSkinController] Override applied: {skinId}");
+            if (debugLogs) Debug.Log("[PlayerSkinController] Override applied: " + skinId);
             return;
         }
 
         if (visual.staticSprite != null)
         {
             ApplyStatic(visual.staticSprite);
-            if (debugLogs) Debug.Log($"[PlayerSkinController] Static applied: {skinId}");
+            if (debugLogs) Debug.Log("[PlayerSkinController] Static applied: " + skinId);
             return;
         }
 
@@ -166,6 +185,7 @@ public class PlayerSkinController : MonoBehaviour
         if (targetAnimator != null)
         {
             targetAnimator.speed = 1f;
+
             if (controller != null)
                 targetAnimator.runtimeAnimatorController = controller;
 

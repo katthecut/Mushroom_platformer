@@ -5,22 +5,20 @@ public class CollectibleManager : MonoBehaviour
 {
     public static CollectibleManager Instance { get; private set; }
 
-    //UI (Optional - TextMeshPro
-    [SerializeField] private TMP_Text collectedText;       // e.g. "3/10"
-    [SerializeField] private TMP_Text totalCollectedText;  // e.g. "Total: 57"
+    [Header("UI")]
+    [SerializeField] private TMP_Text collectedText;
+    [SerializeField] private TMP_Text totalCollectedText;
 
-    //Auto Count
-    //If true, counts all collectibles in the scene at Start
+    [Header("Collectibles")]
     public bool autoCountCollectibles = true;
+
+    [Header("Skins")]
+    [SerializeField] private string[] allSkinIds;
 
     private int collectedThisLevel = 0;
     private int totalInLevel = 0;
 
     private const string PREF_TOTAL = "TOTAL_COLLECTED";
-
-    public int CollectedThisLevel => collectedThisLevel;
-    public int TotalInLevel => totalInLevel;
-    public int TotalCollectedAllTime => PlayerPrefs.GetInt(PREF_TOTAL, 0);
 
     private void Awake()
     {
@@ -43,25 +41,28 @@ public class CollectibleManager : MonoBehaviour
         UpdateUI();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetAllProgress();
+        }
+    }
+
     public void Collect(CollectibleItem item)
     {
         if (item == null) return;
 
-        // Persist collectible if needed
         item.MarkPersisted();
 
-        // Level counter
-        collectedThisLevel += 1;
+        collectedThisLevel++;
 
-        // Global total saved
         int total = PlayerPrefs.GetInt(PREF_TOTAL, 0);
         total += Mathf.Max(1, item.value);
         PlayerPrefs.SetInt(PREF_TOTAL, total);
         PlayerPrefs.Save();
 
-        // Remove pickup
         Destroy(item.gameObject);
-
         UpdateUI();
     }
 
@@ -71,13 +72,55 @@ public class CollectibleManager : MonoBehaviour
             collectedText.text = $"Leaves: {collectedThisLevel}/{totalInLevel}";
 
         if (totalCollectedText != null)
-            totalCollectedText.text = $"Total: {TotalCollectedAllTime}";
+            totalCollectedText.text = $"Total: {PlayerPrefs.GetInt(PREF_TOTAL, 0)}";
     }
 
-    // Optional manual override
-    public void SetTotalInLevel(int total)
+    public void ResetAllProgress()
     {
-        totalInLevel = Mathf.Max(0, total);
+        // 1. Reset collectibles
+        collectedThisLevel = 0;
+        totalInLevel = 0;
+        PlayerPrefs.DeleteKey(PREF_TOTAL);
+
+        // 2. Reset skinove
+        ResetSkins();
+
+        // 3. Osvježi shop UI
+        ResetShopUI();
+
+        // 4. Forsiraj default skin
+        ResetPlayerSkin();
+
+        PlayerPrefs.Save();
         UpdateUI();
+    }
+
+    private void ResetSkins()
+    {
+        if (allSkinIds != null)
+        {
+            foreach (string skinId in allSkinIds)
+            {
+                PlayerPrefs.DeleteKey("SKIN_UNLOCKED_" + skinId);
+            }
+        }
+
+        PlayerPrefs.DeleteKey("SKIN_EQUIPPED");
+        PlayerPrefs.DeleteKey("SKIN_PENDING");
+    }
+
+    private void ResetShopUI()
+    {
+        if (ShopManager.Instance != null)
+            ShopManager.Instance.RefreshAll();
+    }
+
+    private void ResetPlayerSkin()
+    {
+        PlayerSkinController controller = FindFirstObjectByType<PlayerSkinController>();
+        if (controller != null)
+        {
+            controller.ForceResetToDefault();
+        }
     }
 }
