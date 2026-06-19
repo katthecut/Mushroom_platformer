@@ -5,18 +5,18 @@ using Game.Audio;
 [RequireComponent(typeof(Collider2D))]
 public class PlayerAudio : MonoBehaviour
 {
-    //clips
+    [Header("Clips")]
     public AudioClip hitClip;
     public AudioClip jumpClip;
     public AudioClip moveClip;
     public AudioClip attackClip;
 
-    //footsteps
+
+    [Header("Footsteps")]
     public float moveInterval = 0.35f;
     public float moveMinSpeed = 0.1f;
 
-    //Ground Check za footsteps
-    public LayerMask groundLayer; // assignaj u inspectoru na ground
+    public LayerMask groundLayer;
     public float groundCastDistance = 0.08f;
 
     [Range(0.2f, 1f)]
@@ -24,7 +24,7 @@ public class PlayerAudio : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D col;
-    private float moveTimer;
+    private float timer;
 
     private void Awake()
     {
@@ -34,87 +34,104 @@ public class PlayerAudio : MonoBehaviour
 
     private void Update()
     {
-        //koristi trenutni horizontal speed
-        float speed = Mathf.Abs(rb.linearVelocity.x);
-
-        //footsteps only when moving on ground
-        if (speed > moveMinSpeed && IsGrounded())
+        if (Mathf.Abs(rb.linearVelocity.x) > moveMinSpeed && IsGrounded())
         {
-            moveTimer -= Time.deltaTime;
-            if (moveTimer <= 0f)
+            timer -= Time.deltaTime;
+
+            if (timer <= 0f)
             {
-                PlayMove();
-                moveTimer = moveInterval;
+                Play(moveClip, 0.7f);
+                timer = moveInterval;
             }
         }
         else
         {
-            moveTimer = 0f;
+            timer = 0f;
         }
     }
 
     private bool IsGrounded()
     {
-        if (col == null) return false;
-
         Bounds b = col.bounds;
 
-        //BoxCast size kod nogu
-        Vector2 castSize = new Vector2(b.size.x * groundCastWidthFactor, 0.05f);
-        Vector2 castOrigin = new Vector2(b.center.x, b.min.y + 0.02f);
+        Vector2 size = new Vector2(
+            b.size.x * groundCastWidthFactor,
+            0.05f
+        );
 
-        //BoxCast kod groundLayer
-        RaycastHit2D hit = Physics2D.BoxCast(
-            castOrigin,
-            castSize,
+        Vector2 origin = new Vector2(
+            b.center.x,
+            b.min.y + 0.02f
+        );
+
+
+        return Physics2D.BoxCast(
+            origin,
+            size,
             0f,
             Vector2.down,
             groundCastDistance,
             groundLayer
         );
+    }
 
-        return hit.collider != null;
+
+    private void Play(AudioClip clip, float volume = 1f)
+    {
+        if (!clip)
+            return;
+
+        GameAudioManager.Instance?.PlaySFX(
+            clip,
+            volume
+        );
     }
 
     public void PlayHit()
     {
-        if (hitClip == null) return;
-        GameAudioManager.Instance?.PlaySFX(hitClip, 1f);
+        Play(hitClip);
     }
 
     public void PlayJump()
     {
-        if (jumpClip == null) return;
-        GameAudioManager.Instance?.PlaySFX(jumpClip, 1f);
+        Play(jumpClip);
     }
 
     public void PlayMove()
     {
-        if (moveClip == null) return;
-        GameAudioManager.Instance?.PlaySFX(moveClip, 0.7f);
+        Play(moveClip, 0.7f);
     }
 
     public void PlayAttack()
     {
-        if (attackClip == null) return;
-        GameAudioManager.Instance?.PlaySFX(attackClip, 1f);
+        Play(attackClip);
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        // Visualize ground cast in editor
         Collider2D c = GetComponent<Collider2D>();
-        if (c == null) return;
+
+        if (!c)
+            return;
 
         Bounds b = c.bounds;
-        Vector2 castSize = new Vector2(b.size.x * groundCastWidthFactor, 0.05f);
-        Vector2 castOrigin = new Vector2(b.center.x, b.min.y + 0.02f);
-        Vector2 castEnd = castOrigin + Vector2.down * groundCastDistance;
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(castOrigin, castSize);
-        Gizmos.DrawWireCube(castEnd, castSize);
+        Vector2 size = new Vector2(
+            b.size.x * groundCastWidthFactor,
+            0.05f
+        );
+
+        Vector2 start = new Vector2(
+            b.center.x,
+            b.min.y + 0.02f
+        );
+
+        Gizmos.DrawWireCube(start, size);
+        Gizmos.DrawWireCube(
+            start + Vector2.down * groundCastDistance,
+            size
+        );
     }
 #endif
 }

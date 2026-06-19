@@ -31,11 +31,13 @@ public class PlayerAttack : MonoBehaviour
     private Collider2D[] hitBuffer;
     private readonly HashSet<EnemyHealth> damagedThisSwing = new HashSet<EnemyHealth>();
     private PlayerAudio playerAudio;
+    private Animator animator;
 
     private void Awake()
     {
         hitBuffer = new Collider2D[Mathf.Max(4, maxHits)];
         playerAudio = GetComponent<PlayerAudio>();
+        animator = GetComponent<Animator>();
 
         if (attackPosition == null)
         {
@@ -118,6 +120,7 @@ public class PlayerAttack : MonoBehaviour
         }
 
         playerAudio?.PlayAttack();
+        animator.SetTrigger("Attack");
 
         ContactFilter2D filter = new ContactFilter2D
         {

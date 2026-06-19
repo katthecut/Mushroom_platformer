@@ -23,12 +23,14 @@ public class EnemyPillbug : MonoBehaviour
     private float enemyNormalSpeed;
     private SpriteRenderer sr;
     private Rigidbody2D rb;
+    private Animator animator;
 
     void Awake()
     {
         enemy = GetComponent<Enemy>();
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
 
         enemyNormalSpeed = enemy.movementSpeed;
 
@@ -36,8 +38,7 @@ public class EnemyPillbug : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
-        //this is a trauma i shall bear forever ili sto god
-        //hvala spud, smrt interpolaciji
+
     }
 
     // Update is called once per frame
@@ -51,6 +52,7 @@ public class EnemyPillbug : MonoBehaviour
         if (dazedTimer <= 0f)
         {
             isDazed = false;
+            animator.SetBool("Dazed", false);
 
             //flip AFTER recovering
             enemy.Flip();
@@ -68,6 +70,7 @@ public class EnemyPillbug : MonoBehaviour
 
         isRolling = true;
         enemy.movementSpeed = rollSpeed;
+        animator.SetBool("Rolling", true);
     }
 
     //unity event
@@ -80,6 +83,8 @@ public class EnemyPillbug : MonoBehaviour
         isDazed = true;
         dazedTimer = dazedTime;
         enemy.movementSpeed = 0f;
+        animator.SetBool("Rolling", false);
+        animator.SetBool("Dazed", true);
 
         if (tintWhileDazed && sr != null)
             sr.color = dazedTint;

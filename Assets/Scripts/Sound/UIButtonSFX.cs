@@ -5,21 +5,28 @@ using Game.Audio;
 public class UIButtonSFX : MonoBehaviour
 {
     public AudioClip clickClip;
-    [Range(0f, 1f)] public float volume = 1f;
+
+    [Range(0f, 1f)]
+    public float volume = 1f;
+
 
     private void OnEnable()
     {
-        Button[] buttons = GetComponentsInChildren<Button>(true);
-
-        foreach (Button b in buttons)
+        foreach (Button button in GetComponentsInChildren<Button>(true))
         {
-            b.onClick.RemoveListener(PlayClick);
-            b.onClick.AddListener(PlayClick);
+            button.onClick.RemoveListener(PlayClick);
+            button.onClick.AddListener(PlayClick);
         }
     }
 
     private void PlayClick()
     {
-        GameAudioManager.Instance?.PlaySFX(clickClip, volume);
+        if (!clickClip)
+            return;
+
+        GameAudioManager.Instance?.PlaySFX(
+            clickClip,
+            volume
+        );
     }
 }
