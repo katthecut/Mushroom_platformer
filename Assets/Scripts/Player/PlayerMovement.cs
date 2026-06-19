@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private Animator animator;
     private bool isFacingRight = true;
 
     private float originalGravity;
@@ -41,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = 8f;
 
         playerAudio = GetComponent<PlayerAudio>();
+
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -87,6 +91,14 @@ public class PlayerMovement : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         horizontalMove = context.ReadValue<Vector2>().x;
+        if (horizontalMove != 0)
+        {
+            animator.SetBool("Walking", true);
+        }
+        else
+        {
+            animator.SetBool("Walking", false);
+        }
     }
 
     public void Jump(InputAction.CallbackContext context)
@@ -102,6 +114,8 @@ public class PlayerMovement : MonoBehaviour
             // jump sound (only when jump actually happens)
             playerAudio?.PlayJump();
 
+            animator.SetTrigger("Jump");
+
             jumpCount++;
         }
     }
@@ -115,6 +129,7 @@ public class PlayerMovement : MonoBehaviour
 
         canDash = false;
         isDashing = true;
+        animator.SetTrigger("Dash");
 
         dashTimer = dashTime;
         dashCooldownTimer = dashCooldown;

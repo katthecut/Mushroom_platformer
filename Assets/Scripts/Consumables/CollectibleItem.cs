@@ -17,12 +17,11 @@ public class CollectibleItem : MonoBehaviour
 
     private const string PREF_PREFIX = "COLLECTED_";
 
-    private PickupPlaySoundOnRemove pickupSound;
+    private PickupAudio pickupSound;
 
     private void Awake()
     {
-        pickupSound = GetComponent<PickupPlaySoundOnRemove>();
-
+        PickupAudio sound = GetComponent<PickupAudio>();
         // Ensure trigger collider
         var col = GetComponent<Collider2D>();
         col.isTrigger = true;

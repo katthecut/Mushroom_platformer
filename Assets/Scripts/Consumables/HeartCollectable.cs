@@ -2,16 +2,19 @@
 
 public class HeartCollectable : Consumable
 {
-    public void Pickup(Collider2D collider)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        GetComponent<PickupPlaySoundOnRemove>()?.MarkCollected();
+        PickupAudio audio = GetComponent<PickupAudio>();
 
-        GameObject player = collider.gameObject;
-        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
-        if (playerHealth == null) return;
+        if (audio != null)
+            audio.MarkCollected();
+
+        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+
+        if (playerHealth == null)
+            return;
 
         playerHealth.AddHealth(50f);
-
         Destroy(gameObject);
     }
 }
