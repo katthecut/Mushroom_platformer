@@ -3,16 +3,13 @@
 [RequireComponent(typeof(Collider2D))]
 public class CollectibleItem : MonoBehaviour
 {
-    //id for saving
+    // ID za save
     public string collectibleId;
 
-    //how musch pickup adds to total
+    //za currency
     public int value = 1;
 
-    //collectible wont spawn again after collecting it (only if true)
     public bool persistCollected = false;
-
-    //collectible destroyed after collection (only if true) for audio
     public bool destroyAfterCollect = true;
 
     private const string PREF_PREFIX = "COLLECTED_";
@@ -21,21 +18,24 @@ public class CollectibleItem : MonoBehaviour
 
     private void Awake()
     {
-        PickupAudio sound = GetComponent<PickupAudio>();
-        // Ensure trigger collider
-        var col = GetComponent<Collider2D>();
+        pickupSound = GetComponent<PickupAudio>();
+
+        Collider2D col = GetComponent<Collider2D>();
         col.isTrigger = true;
 
+        // Kreira ID ako ga vec nema
         if (string.IsNullOrWhiteSpace(collectibleId))
         {
-            var p = transform.position;
+            Vector3 p = transform.position;
+
             collectibleId =
-                $"{UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}_{Mathf.RoundToInt(p.x * 10f)}_{Mathf.RoundToInt(p.y * 10f)}";
+                $"{UnityEngine.SceneManagement.SceneManager.GetActiveScene().name}_" +
+                $"{Mathf.RoundToInt(p.x * 10f)}_" +
+                $"{Mathf.RoundToInt(p.y * 10f)}";
         }
 
         if (persistCollected)
         {
-            //ako je collected jos od prije unisti se bez zvuka
             if (PlayerPrefs.GetInt(PREF_PREFIX + collectibleId, 0) == 1)
             {
                 Destroy(gameObject);
@@ -45,30 +45,46 @@ public class CollectibleItem : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!other.CompareTag("Player"))
+            return;
 
-        //mark collected, sound plays when removed
-        pickupSound?.MarkCollected();
+        // Play pickup audio
+        if (pickupSound != null)
+        {
+            pickupSound.MarkCollected();
+        }
 
+        // Tell manager the leaf was collected
         if (CollectibleManager.Instance != null)
         {
             CollectibleManager.Instance.Collect(this);
         }
         else
         {
-            Debug.LogWarning("CollectibleItem: No CollectibleManager in scene.");
+            Debug.LogWarning(
+                "CollectibleItem: No CollectibleManager in scene."
+            );
+
+            return;
         }
 
-        MarkPersisted();
-
+        // Destroy leaf
         if (destroyAfterCollect)
+        {
             Destroy(gameObject);
+        }
     }
 
     public void MarkPersisted()
     {
-        if (!persistCollected) return;
-        PlayerPrefs.SetInt(PREF_PREFIX + collectibleId, 1);
+        if (!persistCollected)
+            return;
+
+        PlayerPrefs.SetInt(
+            PREF_PREFIX + collectibleId,
+            1
+        );
+
         PlayerPrefs.Save();
     }
 }

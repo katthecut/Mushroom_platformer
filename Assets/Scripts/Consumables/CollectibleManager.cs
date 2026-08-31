@@ -5,14 +5,17 @@ public class CollectibleManager : MonoBehaviour
 {
     public static CollectibleManager Instance { get; private set; }
 
-    [Header("UI")]
+    // UI
     [SerializeField] private TMP_Text collectedText;
     [SerializeField] private TMP_Text totalCollectedText;
 
-    [Header("Collectibles")]
-    public bool autoCountCollectibles = true;
+    // Win
+    [SerializeField] private GameObject winPanel;
 
-    [Header("Skins")]
+    // Collectibles
+    [SerializeField] private bool autoCountCollectibles = true;
+
+    // Skins
     [SerializeField] private string[] allSkinIds;
 
     private int collectedThisLevel = 0;
@@ -27,15 +30,31 @@ public class CollectibleManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
     private void Start()
     {
+
+        Time.timeScale = 1f;
+
+        //prebroji leaves
         if (autoCountCollectibles)
         {
-            CollectibleItem[] items = FindObjectsByType<CollectibleItem>(FindObjectsSortMode.None);
+            CollectibleItem[] items =
+                FindObjectsByType<CollectibleItem>(FindObjectsSortMode.None);
+
             totalInLevel = items.Length;
+        }
+
+        //counter pocinje od 0
+        collectedThisLevel = 0;
+
+        // VictoryPanel skriven na pocetku
+        if (winPanel != null)
+        {
+            winPanel.SetActive(false);
         }
 
         UpdateUI();
@@ -43,6 +62,7 @@ public class CollectibleManager : MonoBehaviour
 
     private void Update()
     {
+        //reset
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetAllProgress();
@@ -51,47 +71,77 @@ public class CollectibleManager : MonoBehaviour
 
     public void Collect(CollectibleItem item)
     {
-        if (item == null) return;
+        if (item == null)
+            return;
 
         item.MarkPersisted();
 
         collectedThisLevel++;
 
+        // Dodaje leaf u ukupni broj za shop
         int total = PlayerPrefs.GetInt(PREF_TOTAL, 0);
+
         total += Mathf.Max(1, item.value);
+
         PlayerPrefs.SetInt(PREF_TOTAL, total);
         PlayerPrefs.Save();
 
-        Destroy(item.gameObject);
         UpdateUI();
+
+        if (collectedThisLevel >= totalInLevel && totalInLevel > 0)
+        {
+            Victory();
+        }
     }
 
     private void UpdateUI()
     {
         if (collectedText != null)
-            collectedText.text = $"Leaves: {collectedThisLevel}/{totalInLevel}";
+        {
+            collectedText.text = $"{collectedThisLevel}/{totalInLevel}";
+        }
 
         if (totalCollectedText != null)
-            totalCollectedText.text = $"Total: {PlayerPrefs.GetInt(PREF_TOTAL, 0)}";
+        {
+            totalCollectedText.text =
+                $"Total: {PlayerPrefs.GetInt(PREF_TOTAL, 0)}";
+        }
+    }
+
+    private void Victory()
+    {
+        Debug.Log("YOU WIN!");
+
+        if (winPanel == null)
+        {
+            Debug.LogError("VictoryPanel nije dodijeljen u CollectibleManageru!");
+            return;
+        }
+
+        //pause gameplay
+        Time.timeScale = 0f;
+
+        //prikazi VictoryPanel
+        winPanel.SetActive(true);
+
+        Debug.Log("VictoryPanel on!");
     }
 
     public void ResetAllProgress()
     {
-        // 1. Reset collectibles
+        Time.timeScale = 1f;
+
         collectedThisLevel = 0;
         totalInLevel = 0;
+
         PlayerPrefs.DeleteKey(PREF_TOTAL);
 
-        // 2. Reset skinove
         ResetSkins();
-
-        // 3. Osvježi shop UI
         ResetShopUI();
-
-        // 4. Forsiraj default skin
         ResetPlayerSkin();
 
         PlayerPrefs.Save();
+
         UpdateUI();
     }
 
@@ -112,12 +162,16 @@ public class CollectibleManager : MonoBehaviour
     private void ResetShopUI()
     {
         if (ShopManager.Instance != null)
+        {
             ShopManager.Instance.RefreshAll();
+        }
     }
 
     private void ResetPlayerSkin()
     {
-        PlayerSkinController controller = FindFirstObjectByType<PlayerSkinController>();
+        PlayerSkinController controller =
+            FindFirstObjectByType<PlayerSkinController>();
+
         if (controller != null)
         {
             controller.ForceResetToDefault();
