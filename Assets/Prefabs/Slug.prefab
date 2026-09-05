@@ -162,8 +162,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.69906425, y: -0.04113445}
-  m_Size: {x: 16.507847, y: 5.981088}
+  m_Offset: {x: -0.46863604, y: -0.041134518}
+  m_Size: {x: 18.121506, y: 5.981089}
   m_Direction: 1
 --- !u!95 &2453407682596168114
 Animator:
@@ -242,6 +242,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 12
+  flashDuration: 0.25
+  flashColor: {r: 1, g: 0, b: 0, a: 0.75}
 --- !u!114 &5908722592733357372
 MonoBehaviour:
   m_ObjectHideFlags: 0

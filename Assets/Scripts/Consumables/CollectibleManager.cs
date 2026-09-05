@@ -18,6 +18,9 @@ public class CollectibleManager : MonoBehaviour
     // Skins
     [SerializeField] private string[] allSkinIds;
 
+    //Collectible UI
+    [SerializeField] private CollectibleUI collectibleUI;
+
     private int collectedThisLevel = 0;
     private int totalInLevel = 0;
 
@@ -48,6 +51,11 @@ public class CollectibleManager : MonoBehaviour
             totalInLevel = items.Length;
         }
 
+        if (collectibleUI != null)
+        {
+            collectibleUI.SetCounter(0, totalInLevel);
+        }
+
         //counter pocinje od 0
         collectedThisLevel = 0;
 
@@ -71,22 +79,22 @@ public class CollectibleManager : MonoBehaviour
 
     public void Collect(CollectibleItem item)
     {
-        if (item == null)
-            return;
-
         item.MarkPersisted();
 
         collectedThisLevel++;
 
-        // Dodaje leaf u ukupni broj za shop
-        int total = PlayerPrefs.GetInt(PREF_TOTAL, 0);
+        int currentTotal = PlayerPrefs.GetInt(PREF_TOTAL, 0);
+        currentTotal += item.value;
 
-        total += Mathf.Max(1, item.value);
-
-        PlayerPrefs.SetInt(PREF_TOTAL, total);
+        PlayerPrefs.SetInt(PREF_TOTAL, currentTotal);
         PlayerPrefs.Save();
 
         UpdateUI();
+
+        if (collectibleUI != null)
+        {
+            collectibleUI.SetCounter(collectedThisLevel, totalInLevel);
+        }
 
         if (collectedThisLevel >= totalInLevel && totalInLevel > 0)
         {

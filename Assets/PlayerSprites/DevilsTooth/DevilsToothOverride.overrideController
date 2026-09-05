@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: DevilsToothOverride
+  m_Controller: {fileID: 9100000, guid: 74ddd33d9868bcb448a4e98e4308d600, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: bc08126eabc4c6fddaa49770970ab302, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 71eed05222fac5749813ab6f2b39831a, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 99e2e5782c2724adf86c9c8c44c80585, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: cab5351ef9b665948b4500ab4d819c6f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 8eca71717ea541b63abc64cdbd963b71, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 08457785385a7694a8a66d5b3401f57f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: d8711d5107cf16741ae8e168fac13c4a, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 0b0dab109a482a84b96254e847f12ea8, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 5f21ed1e7643ce140954562e5711343e, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: eaf3d923440d1674193d8a04bde50ae4, type: 2}
